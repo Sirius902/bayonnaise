@@ -29,9 +29,9 @@ pub const Checksum = struct {
         try stream.seekTo(0x20);
         const reader = stream.reader();
 
-        var low_sum: u32 = 0;
-        var high_sum: u32 = 0;
-        var xor_sum: u32 = 0;
+        var low: u32 = 0;
+        var high: u32 = 0;
+        var xor: u32 = 0;
 
         while (true) {
             const word = reader.readIntLittle(u32) catch |err| {
@@ -41,15 +41,15 @@ pub const Checksum = struct {
                 }
             };
 
-            low_sum += @truncate(u16, word);
-            high_sum += @truncate(u16, word >> @bitSizeOf(u16));
-            xor_sum ^= word;
+            low += @truncate(u16, word);
+            high += @truncate(u16, word >> @bitSizeOf(u16));
+            xor ^= word;
         }
 
         return Checksum{
-            .low = low_sum,
-            .high = high_sum,
-            .xor = xor_sum,
+            .low = low,
+            .high = high,
+            .xor = xor,
         };
     }
 };
