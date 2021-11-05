@@ -25,14 +25,14 @@ pub fn main() !void {
         return;
     }
 
-    const save_data = try save_file.readToEndAlloc(allocator, save.pc_save_len);
-    defer allocator.free(save_data);
+    const reader = std.io.bufferedReader(save_file.reader()).reader();
+    const save_data = try save.deserialize(reader, allocator);
+    defer allocator.destroy(save_data);
 
-    var stream = std.io.fixedBufferStream(save_data);
-
-    const original = try save.Checksum.retrieve(&stream);
-    const computed = try save.Checksum.compute(&stream);
-
-    std.log.info("original: low sum = {x:0>8}, high sum = {x:0>8}, xor sum = {x:0>8}", .{ original.low, original.high, original.xor });
-    std.log.info("computed: low sum = {x:0>8}, high sum = {x:0>8}, xor sum = {x:0>8}", .{ computed.low, computed.high, computed.xor });
+    std.log.info("magic = {x:0>8}, checksums = {{ low = {x:0>8}, high = {x:0>8}, xor = {x:0>8} }}", .{
+        save_data.magic,
+        save_data.checksum.low,
+        save_data.checksum.high,
+        save_data.checksum.xor,
+    });
 }
