@@ -92,8 +92,17 @@ fn deserializeInto(comptime T: type, t: *T, reader: anytype) !void {
             }
         },
         .Array => |A| {
-            for (t) |*v| {
-                try deserializeInto(A.child, v, reader);
+            switch (A.child) {
+                u8 => {
+                    if ((try reader.readAll(t)) < A.len) {
+                        return error.EndOfStream;
+                    }
+                },
+                else => {
+                    for (t) |*v| {
+                        try deserializeInto(A.child, v, reader);
+                    }
+                },
             }
         },
         else => @compileError("unsupported type: " ++ @typeName(T)),
