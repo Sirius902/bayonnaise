@@ -164,19 +164,21 @@ pub const ChecksumState = struct {
 };
 
 fn streamedSize(comptime T: type) usize {
-    return switch (@typeInfo(T)) {
-        .Void, .Bool, .Int, .Float => @sizeOf(T),
-        .Struct => |S| blk: {
-            var size: usize = 0;
-            inline for (S.fields) |field| {
-                if (field.is_comptime) continue;
-                size += streamedSize(field.field_type);
-            }
-            break :blk size;
-        },
-        .Array => |A| A.len * streamedSize(A.child),
-        else => @compileError("unsupported type: " ++ @typeName(T)),
-    };
+    comptime {
+        return switch (@typeInfo(T)) {
+            .Void, .Bool, .Int, .Float => @sizeOf(T),
+            .Struct => |S| blk: {
+                var size: usize = 0;
+                inline for (S.fields) |field| {
+                    if (field.is_comptime) continue;
+                    size += streamedSize(field.field_type);
+                }
+                break :blk size;
+            },
+            .Array => |A| A.len * streamedSize(A.child),
+            else => @compileError("unsupported type: " ++ @typeName(T)),
+        };
+    }
 }
 
 fn DeserializeError(comptime ReaderType: type) type {
