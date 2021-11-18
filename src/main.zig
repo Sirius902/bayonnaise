@@ -25,14 +25,22 @@ pub fn main() !void {
         return;
     }
 
-    const reader = std.io.bufferedReader(save_file.reader()).reader();
+    var checksum_reader = save.checksumReader(std.io.bufferedReader(save_file.reader()).reader());
+    const reader = checksum_reader.reader();
     const save_data = try save.deserialize(reader, allocator);
     defer allocator.destroy(save_data);
 
-    std.log.info("magic = {x:0>8}, checksums = {{ low = {x:0>8}, high = {x:0>8}, xor = {x:0>8} }}", .{
-        save_data.magic,
-        save_data.checksum.low,
-        save_data.checksum.high,
-        save_data.checksum.xor,
+    std.log.info("magic = {x:0>8},\tchecksums = {{ low = {x:0>8}, high = {x:0>8}, xor = {x:0>8} }}", .{
+        save_data.header.magic,
+        save_data.header.checksum.low,
+        save_data.header.checksum.high,
+        save_data.header.checksum.xor,
+    });
+
+    const computed = try checksum_reader.finalize();
+    std.log.info("calculated:\tchecksums = {{ low = {x:0>8}, high = {x:0>8}, xor = {x:0>8} }}", .{
+        computed.low,
+        computed.high,
+        computed.xor,
     });
 }

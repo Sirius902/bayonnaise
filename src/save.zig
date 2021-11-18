@@ -4,10 +4,14 @@ const Allocator = std.mem.Allocator;
 pub const pc_save_len = 0x11550;
 
 pub const Data = struct {
+    header: Header,
+    unk_18: [0x11538]u8,
+};
+
+pub const Header = struct {
     magic: u32,
     unk_04: [0x8]u8,
     checksum: Checksum,
-    unk_18: [0x11538]u8,
 };
 
 pub const Checksum = struct {
@@ -55,10 +59,86 @@ pub const Checksum = struct {
     }
 };
 
-const ChecksumState = struct {
-    checksum: Checksum,
-    state: [4]u8,
-    index: usize,
+pub fn ChecksumReader(comptime ReaderType: type) type {
+    return struct {
+        wrapped_reader: ReaderType,
+        checksum_state: ChecksumState = .{},
+        header_state: u8 = 0,
+
+        pub const Error = ReaderType.Error;
+        pub const Reader = std.io.Reader(*Self, Error, read);
+
+        const Self = @This();
+
+        pub fn finalize(self: Self) error{NotFinalized}!Checksum {
+            return try self.checksum_state.finalize();
+        }
+
+        pub fn read(self: *Self, dest: []u8) Error!usize {
+            const read_len = try self.wrapped_reader.read(dest);
+
+            for (dest) |b| {
+                if (self.header_state < streamedSize(Header)) {
+                    self.header_state += 1;
+                } else {
+                    self.checksum_state.feed(b);
+                }
+            }
+
+            return read_len;
+        }
+
+        pub fn reader(self: *Self) Reader {
+            return .{ .context = self };
+        }
+    };
+}
+
+pub fn ChecksumWriter(comptime WriterType: type) type {
+    return struct {
+        wrapped_writer: WriterType,
+        checksum_state: ChecksumState = .{},
+        header_state: u8 = 0,
+
+        pub const Error = WriterType.Error;
+        pub const Writer = std.io.Writer(*Self, Error, write);
+
+        const Self = @This();
+
+        pub fn finalize(self: Self) error{NotFinalized}!Checksum {
+            return try self.checksum_state.finalize();
+        }
+
+        pub fn write(self: *Self, bytes: []const u8) Error!usize {
+            for (bytes) |b| {
+                if (self.header_state < streamedSize(Header)) {
+                    self.header_state += 1;
+                } else {
+                    self.checksum_state.feed(b);
+                }
+            }
+
+            return try self.wrapped_writer.write(bytes);
+        }
+
+        pub fn writer(self: *Self) Writer {
+            return .{ .context = self };
+        }
+    };
+}
+
+pub fn checksumReader(underlying_stream: anytype) ChecksumReader(@TypeOf(underlying_stream)) {
+    return .{ .wrapped_reader = underlying_stream };
+}
+
+pub fn checksumWriter(underlying_stream: anytype) ChecksumWriter(@TypeOf(underlying_stream)) {
+    return .{ .wrapped_writer = underlying_stream };
+}
+
+pub const ChecksumState = struct {
+    checksum: Checksum = .{ .low = 0, .high = 0, .xor = 0 },
+    state: [4]u8 = undefined,
+    index: usize = 0,
 
     pub fn feed(self: *ChecksumState, byte: u8) void {
         self.state[self.index] = byte;
@@ -73,7 +153,31 @@ const ChecksumState = struct {
             self.checksum.xor ^= word;
         }
     }
+
+    pub fn finalize(self: ChecksumState) error{NotFinalized}!Checksum {
+        if (self.index == 0) {
+            return self.checksum;
+        } else {
+            return error.NotFinalized;
+        }
+    }
 };
+
+fn streamedSize(comptime T: type) usize {
+    return switch (@typeInfo(T)) {
+        .Void, .Bool, .Int, .Float => @sizeOf(T),
+        .Struct => |S| blk: {
+            var size: usize = 0;
+            inline for (S.fields) |field| {
+                if (field.is_comptime) continue;
+                size += streamedSize(field.field_type);
+            }
+            break :blk size;
+        },
+        .Array => |A| A.len * streamedSize(A.child),
+        else => @compileError("unsupported type: " ++ @typeName(T)),
+    };
+}
 
 fn DeserializeError(comptime ReaderType: type) type {
     return ReaderType.Error || error{EndOfStream} || Allocator.Error;
