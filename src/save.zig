@@ -5,12 +5,18 @@ pub const pc_save_len = streamedSize(Data);
 comptime {
     const expected_len = 0x11550;
     if (pc_save_len != expected_len)
-        @compileError(std.fmt.comptimePrint("PC save len wrong: expected 0x{X}, got 0x{X}", .{ expected_len, pc_save_len }));
+        @compileError(std.fmt.comptimePrint("PC save len wrong: expected 0x{x}, got 0x{x}", .{ expected_len, pc_save_len }));
 }
 
 pub const Data = struct {
     header: Header,
-    unk_18: [0x11538]u8,
+    unk_18: [0x1C]u8,
+    play_time: u32,
+    unk_38: [0xEEEC]u8,
+    character: u32,
+    unk_EF28: [0x2C]u8,
+    halos: u32,
+    unk_EF58: [0x25F8]u8,
 };
 
 pub const Header = struct {

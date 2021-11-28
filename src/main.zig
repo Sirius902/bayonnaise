@@ -43,4 +43,19 @@ pub fn main() !void {
         computed.high,
         computed.xor,
     });
+
+    std.log.info("play time: {:0>2}:{:0>2}:{:0>2} | frames: {}", .{
+        save_data.play_time / (60 * 60 * 60),
+        (save_data.play_time / (60 * 60)) % 60,
+        (save_data.play_time / 60) % 60,
+        save_data.play_time,
+    });
+    std.log.info("halos: {}", .{save_data.halos});
+
+    const characters = [_][]const u8{ "Bayonetta", "Jeanne", "Zero" };
+    if (save_data.character < characters.len) {
+        std.log.info("character: {s}", .{characters[save_data.character]});
+    } else {
+        std.log.info("character: Invalid = 0x{x:0>8}", .{save_data.character});
+    }
 }
