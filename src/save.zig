@@ -1,7 +1,12 @@
 const std = @import("std");
 const Allocator = std.mem.Allocator;
 
-pub const pc_save_len = 0x11550;
+pub const pc_save_len = streamedSize(Data);
+comptime {
+    const expected_len = 0x11550;
+    if (pc_save_len != expected_len)
+        @compileError(std.fmt.comptimePrint("PC save len wrong: expected 0x{X}, got 0x{X}", .{ expected_len, pc_save_len }));
+}
 
 pub const Data = struct {
     header: Header,
@@ -78,7 +83,7 @@ pub fn ChecksumReader(comptime ReaderType: type) type {
             const read_len = try self.wrapped_reader.read(dest);
 
             for (dest) |b| {
-                if (self.header_state < streamedSize(Header)) {
+                if (self.header_state < comptime streamedSize(Header)) {
                     self.header_state += 1;
                 } else {
                     self.checksum_state.feed(b);
@@ -111,7 +116,7 @@ pub fn ChecksumWriter(comptime WriterType: type) type {
 
         pub fn write(self: *Self, bytes: []const u8) Error!usize {
             for (bytes) |b| {
-                if (self.header_state < streamedSize(Header)) {
+                if (self.header_state < comptime streamedSize(Header)) {
                     self.header_state += 1;
                 } else {
                     self.checksum_state.feed(b);
@@ -193,7 +198,6 @@ fn deserializeInto(comptime T: type, t: *T, reader: anytype) !void {
         .Struct => |S| {
             inline for (S.fields) |field| {
                 if (field.is_comptime) continue;
-
                 try deserializeInto(field.field_type, &@field(t.*, field.name), reader);
             }
         },
@@ -219,9 +223,8 @@ pub fn deserialize(reader: anytype, allocator: *Allocator) DeserializeError(@Typ
     var data = try allocator.create(Data);
     errdefer allocator.destroy(data);
 
-    inline for (std.meta.fields(Data)) |field| {
+    inline for (comptime std.meta.fields(Data)) |field| {
         if (field.is_comptime) continue;
-
         try deserializeInto(field.field_type, &@field(data.*, field.name), reader);
     }
 
