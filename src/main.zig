@@ -51,6 +51,7 @@ pub fn main() !void {
         save_data.play_time,
     });
     std.log.info("halos: {}", .{save_data.halos});
+    std.log.info("chapter clears: {}", .{save_data.chapter_clears});
 
     const characters = [_][]const u8{ "Bayonetta", "Jeanne", "Zero" };
     if (save_data.character < characters.len) {
