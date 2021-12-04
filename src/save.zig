@@ -9,8 +9,7 @@ comptime {
 }
 
 pub const ChapterStats = struct {
-    info: u8, // & 1 unlocked, & 2 completed
-    unk_01: [3]u8,
+    info: u32, // & 1 unlocked, & 2 completed
     unk_04: [4]u8,
     time: u32,
     combo: u32,
@@ -18,7 +17,8 @@ pub const ChapterStats = struct {
     unk_14: [0x20]u8,
     // TODO: Figure out how many exactly
     verses: [15]VerseStats,
-    unk_160: [0x18]u8,
+    unk_160: [0x17]u8,
+    unk_177: u8, // & 0x40 is true if received platinum trophy
 };
 
 pub const VerseStats = struct {
