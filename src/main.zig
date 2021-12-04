@@ -1,6 +1,10 @@
 const std = @import("std");
 const save = @import("save.zig");
 
+comptime {
+    std.testing.refAllDecls(@This());
+}
+
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
