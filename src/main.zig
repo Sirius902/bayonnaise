@@ -58,7 +58,7 @@ pub fn main() !void {
     std.log.info("chapter clears: {}", .{save_data.chapter_clears});
 
     std.log.info("====<Normal> Prologue Stats====", .{});
-    const ch = &save_data.difficulties[2].prologue;
+    const ch = &save_data.difficulties[2][1];
     std.log.info("info: {x:0>2}", .{ch.info});
     std.log.info("time: {:0>2}:{:0>2}:{:0>2}.{:0>2} | frames: {}", .{
         ch.time / (60 * 60 * 60),
@@ -69,7 +69,7 @@ pub fn main() !void {
     });
     std.log.info("combo: {}", .{ch.combo});
     std.log.info("damage: {}", .{ch.damage});
-    for (ch.verses[1..]) |verse, i| {
+    for (ch.verses[1..3]) |verse, i| {
         std.log.info("=========Verse {} Start=========", .{i + 1});
         std.log.info("time: {:0>2}:{:0>2}:{:0>2}.{:0>2} | frames: {}", .{
             verse.time / (60 * 60 * 60),

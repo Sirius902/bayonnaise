@@ -8,27 +8,21 @@ comptime {
         @compileError(std.fmt.comptimePrint("PC save len wrong: expected 0x{x}, got 0x{x}", .{ expected_len, pc_save_len }));
 }
 
-pub const DifficultyStats = struct {
-    prologue: ChapterStats(2),
-    unk_78: [0x1CE8]u8,
+pub const ChapterStats = struct {
+    info: u8, // & 1 unlocked, & 2 completed
+    unk_01: [3]u8,
+    unk_04: [4]u8,
+    time: u32,
+    combo: u32,
+    damage: u32,
+    unk_14: [0x20]u8,
+    // TODO: Figure out how many exactly
+    verses: [15]VerseStats,
+    unk_160: [0x18]u8,
 };
 
-pub fn ChapterStats(comptime num_verses: usize) type {
-    return struct {
-        info: u8, // & 1 unlocked, & 2 completed
-        unk_01: [3]u8,
-        unk_04: [4]u8,
-        time: u32,
-        combo: u32,
-        damage: u32,
-        unk_14: [0x20]u8,
-        verses: [num_verses + 1]VerseStats,
-        unk_70: [8]u8,
-    };
-}
-
 pub const VerseStats = struct {
-    unk_00: u32,
+    unk_00: [4]u8,
     time: u32,
     combo: u32,
     damage: u32,
@@ -39,9 +33,9 @@ pub const Data = struct {
     header: Header,
     unk_18: [0x1C]u8,
     play_time: u32,
-    unk_38: [0x1E8]u8,
-    difficulties: [5]DifficultyStats,
-    unk_9500: [0x590C]u8,
+    unk_38: [0x70]u8,
+    difficulties: [5][20]ChapterStats,
+    unk_9388: [0x5A84]u8,
     chapter_clears: u32,
     unk_EE10: [0x114]u8,
     character: u32,
