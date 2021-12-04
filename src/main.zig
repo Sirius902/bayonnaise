@@ -53,6 +53,33 @@ pub fn main() !void {
     std.log.info("halos: {}", .{save_data.halos});
     std.log.info("chapter clears: {}", .{save_data.chapter_clears});
 
+    std.log.info("====<Normal> Prologue Stats====", .{});
+    const ch = &save_data.difficulties[2].prologue;
+    std.log.info("info: {x:0>2}", .{ch.info});
+    std.log.info("time: {:0>2}:{:0>2}:{:0>2}.{:0>2} | frames: {}", .{
+        ch.time / (60 * 60 * 60),
+        (ch.time / (60 * 60)) % 60,
+        (ch.time / 60) % 60,
+        ((ch.time * 100) / 60) % 100,
+        ch.time,
+    });
+    std.log.info("combo: {}", .{ch.combo});
+    std.log.info("damage: {}", .{ch.damage});
+    for (ch.verses[1..]) |verse, i| {
+        std.log.info("=========Verse {} Start=========", .{i + 1});
+        std.log.info("time: {:0>2}:{:0>2}:{:0>2}.{:0>2} | frames: {}", .{
+            verse.time / (60 * 60 * 60),
+            (verse.time / (60 * 60)) % 60,
+            (verse.time / 60) % 60,
+            ((verse.time * 10) / 6) % 100,
+            verse.time,
+        });
+        std.log.info("combo: {}", .{verse.combo});
+        std.log.info("damage: {}", .{verse.damage});
+        std.log.info("==========Verse {} End==========", .{i + 1});
+    }
+    std.log.info("=====<Normal> Prologue End=====", .{});
+
     const characters = [_][]const u8{ "Bayonetta", "Jeanne", "Zero" };
     if (save_data.character < characters.len) {
         std.log.info("character: {s}", .{characters[save_data.character]});

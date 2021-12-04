@@ -8,11 +8,40 @@ comptime {
         @compileError(std.fmt.comptimePrint("PC save len wrong: expected 0x{x}, got 0x{x}", .{ expected_len, pc_save_len }));
 }
 
+pub const DifficultyStats = struct {
+    prologue: ChapterStats(2),
+    unk_78: [0x1CE8]u8,
+};
+
+pub fn ChapterStats(comptime num_verses: usize) type {
+    return struct {
+        info: u8, // & 1 unlocked, & 2 completed
+        unk_01: [3]u8,
+        unk_04: [4]u8,
+        time: u32,
+        combo: u32,
+        damage: u32,
+        unk_14: [0x20]u8,
+        verses: [num_verses + 1]VerseStats,
+        unk_70: [8]u8,
+    };
+}
+
+pub const VerseStats = struct {
+    unk_00: u32,
+    time: u32,
+    combo: u32,
+    damage: u32,
+    unk_10: [4]u8,
+};
+
 pub const Data = struct {
     header: Header,
     unk_18: [0x1C]u8,
     play_time: u32,
-    unk_38: [0xEDD4]u8,
+    unk_38: [0x1E8]u8,
+    difficulties: [5]DifficultyStats,
+    unk_9500: [0x590C]u8,
     chapter_clears: u32,
     unk_EE10: [0x114]u8,
     character: u32,
@@ -194,6 +223,18 @@ fn streamedSize(comptime T: type) usize {
     }
 }
 
+fn streamedOffset(comptime T: type, comptime field_name: []const u8) usize {
+    comptime {
+        var offset: usize = 0;
+        inline for (@typeInfo(T).Struct.fields) |field| {
+            if (field.is_comptime) continue;
+            if (std.mem.eql(u8, field.name, field_name)) return offset;
+            offset += streamedSize(field.field_type);
+        }
+        @compileError("no field \"" ++ field_name ++ "\" on type \"" ++ @typeName(T) ++ "\"");
+    }
+}
+
 fn DeserializeError(comptime ReaderType: type) type {
     return ReaderType.Error || error{EndOfStream} || Allocator.Error;
 }
@@ -237,4 +278,23 @@ pub fn deserialize(reader: anytype, allocator: *Allocator) DeserializeError(@Typ
     }
 
     return data;
+}
+
+test "unk fields are named correctly" {
+    try (struct {
+        pub fn validate(comptime T: type) !void {
+            inline for (@typeInfo(T).Struct.fields) |field| {
+                if (comptime std.mem.startsWith(u8, field.name, "unk_")) {
+                    const offset = try std.fmt.parseUnsigned(usize, field.name[4..], 16);
+                    try std.testing.expectEqual(comptime streamedOffset(T, field.name), offset);
+                }
+                switch (@typeInfo(field.field_type)) {
+                    .Struct => {
+                        try comptime validate(field.field_type);
+                    },
+                    else => {},
+                }
+            }
+        }
+    }.validate)(Data);
 }
