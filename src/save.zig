@@ -281,20 +281,42 @@ pub fn deserialize(reader: anytype, allocator: *Allocator) DeserializeError(@Typ
 }
 
 test "unk fields are named correctly" {
-    try (struct {
-        pub fn validate(comptime T: type) !void {
+    const ExpectedTuple = std.meta.Tuple(&[_]type{ []const u8, []const u8 });
+    comptime var type_stack: []const type = &.{Data};
+    comptime var expected_tuple: []const ExpectedTuple = &.{};
+
+    comptime {
+        while (type_stack.len > 0) {
+            const T = type_stack[0];
+            type_stack = type_stack[1..];
+
             inline for (@typeInfo(T).Struct.fields) |field| {
-                if (comptime std.mem.startsWith(u8, field.name, "unk_")) {
-                    const offset = try std.fmt.parseUnsigned(usize, field.name[4..], 16);
-                    try std.testing.expectEqual(comptime streamedOffset(T, field.name), offset);
+                if (std.mem.startsWith(u8, field.name, "unk_")) {
+                    const expected = std.fmt.comptimePrint("{s}.unk_{X:0>2}", .{
+                        @typeName(T),
+                        streamedOffset(T, field.name),
+                    });
+                    const actual = @typeName(T) ++ "." ++ field.name;
+                    expected_tuple = expected_tuple ++ &[_]ExpectedTuple{.{ expected, actual }};
                 }
+
                 switch (@typeInfo(field.field_type)) {
                     .Struct => {
-                        try comptime validate(field.field_type);
+                        type_stack = type_stack ++ &[_]type{field.field_type};
+                    },
+                    .Array, .Vector, .Pointer, .Optional => {
+                        const Elem = std.meta.Elem(field.field_type);
+                        if (@typeInfo(Elem) == .Struct) {
+                            type_stack = type_stack ++ &[_]type{Elem};
+                        }
                     },
                     else => {},
                 }
             }
         }
-    }.validate)(Data);
+    }
+
+    inline for (expected_tuple) |tuple| {
+        try std.testing.expectEqualStrings(tuple.@"0", tuple.@"1");
+    }
 }
