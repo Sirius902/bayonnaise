@@ -61,14 +61,14 @@ pub fn main() !void {
     const ch = &save_data.difficulties[2][1];
     std.log.info("info: {x:0>2}", .{ch.info});
     std.log.info("time: {:0>2}:{:0>2}:{:0>2}.{:0>2} | frames: {}", .{
-        ch.time / (60 * 60 * 60),
-        (ch.time / (60 * 60)) % 60,
-        (ch.time / 60) % 60,
-        ((ch.time * 100) / 60) % 100,
-        ch.time,
+        ch.overall.time / (60 * 60 * 60),
+        (ch.overall.time / (60 * 60)) % 60,
+        (ch.overall.time / 60) % 60,
+        ((ch.overall.time * 100) / 60) % 100,
+        ch.overall.time,
     });
-    std.log.info("combo: {}", .{ch.combo});
-    std.log.info("damage: {}", .{ch.damage});
+    std.log.info("combo: {}", .{ch.overall.combo});
+    std.log.info("damage: {}", .{ch.overall.damage});
     for (ch.verses[1..3]) |verse, i| {
         std.log.info("=========Verse {} Start=========", .{i + 1});
         std.log.info("time: {:0>2}:{:0>2}:{:0>2}.{:0>2} | frames: {}", .{
