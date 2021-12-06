@@ -257,7 +257,7 @@ fn deserializeInto(comptime T: type, t: *T, reader: anytype) !void {
     }
 }
 
-pub fn deserialize(reader: anytype, allocator: *Allocator) DeserializeError(@TypeOf(reader))!*Data {
+pub fn deserialize(reader: anytype, allocator: Allocator) DeserializeError(@TypeOf(reader))!*Data {
     var data = try allocator.create(Data);
     errdefer allocator.destroy(data);
 
