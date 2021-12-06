@@ -20,7 +20,7 @@ pub const ChapterStats = struct {
 
 pub const BattleStats = struct {
     unk_00: u8,
-    unk_01: [3]u8,
+    pad_01: [3]u8,
     time: u32,
     combo: u32,
     damage: u32,
@@ -284,7 +284,7 @@ pub fn deserialize(reader: anytype, allocator: Allocator) DeserializeError(@Type
     return data;
 }
 
-test "unk fields are named correctly" {
+test "unk and pad fields are named correctly" {
     const ExpectedTuple = std.meta.Tuple(&[_]type{ []const u8, []const u8 });
     comptime var type_stack: []const type = &.{Data};
     comptime var expected_tuple: []const ExpectedTuple = &.{};
@@ -295,9 +295,10 @@ test "unk fields are named correctly" {
             type_stack = type_stack[1..];
 
             inline for (@typeInfo(T).Struct.fields) |field| {
-                if (std.mem.startsWith(u8, field.name, "unk_")) {
-                    const expected = std.fmt.comptimePrint("{s}.unk_{X:0>2}", .{
+                if (std.mem.startsWith(u8, field.name, "unk_") or std.mem.startsWith(u8, field.name, "pad_")) {
+                    const expected = std.fmt.comptimePrint("{s}.{s}{X:0>2}", .{
                         @typeName(T),
+                        field.name[0..4],
                         streamedOffset(T, field.name),
                     });
                     const actual = @typeName(T) ++ "." ++ field.name;
