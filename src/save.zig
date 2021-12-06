@@ -28,7 +28,7 @@ pub const BattleStats = struct {
 
 pub const Data = struct {
     header: Header,
-    unk_18: [0x1C]u8,
+    unk_20: [0x14]u8,
     play_time: u32,
     unk_38: [0x70]u8,
     difficulties: [5][20]ChapterStats,
@@ -53,6 +53,7 @@ pub const Header = struct {
     magic: u32,
     unk_04: [0x8]u8,
     checksum: Checksum,
+    unk_18: [0x8]u8,
 };
 
 pub const Checksum = struct {
