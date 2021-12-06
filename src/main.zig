@@ -48,6 +48,9 @@ pub fn main() !void {
         computed.xor,
     });
 
+    std.log.info("chapter: {}", .{save_data.chapter});
+    std.log.info("difficulty: {}", .{save_data.difficulty});
+
     std.log.info("play time: {:0>2}:{:0>2}:{:0>2} | frames: {}", .{
         save_data.play_time / (60 * 60 * 60),
         (save_data.play_time / (60 * 60)) % 60,
