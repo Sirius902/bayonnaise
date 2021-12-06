@@ -34,11 +34,17 @@ pub const Data = struct {
     difficulties: [5][20]ChapterStats,
     unk_9388: [0x5A84]u8,
     chapter_clears: u32,
-    unk_EE10: [0x114]u8,
+    unk_EE10: [0xEA]u8,
+    weapons: u16,
+    unk_EEFC: [0x28]u8,
     character: u32,
-    unk_EF28: [0x2C]u8,
+    unk_EF28: [0x1C]u8,
+    techniques: u32, // & 0x8 is Bat Within
+    bought_techniques: u32,
+    unk_EF4C: [0x8]u8,
     halos: u32,
-    unk_EF58: [0x25F8]u8,
+    unk_EF58: [0xCF8]u8,
+    unk_FC50: [0x1900]u8, // current chapter stats
 };
 
 pub const Header = struct {
