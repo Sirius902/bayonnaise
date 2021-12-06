@@ -19,11 +19,12 @@ pub const ChapterStats = struct {
 };
 
 pub const BattleStats = struct {
-    unk_00: [4]u8,
+    unk_00: u8,
+    unk_01: [3]u8,
     time: u32,
     combo: u32,
     damage: u32,
-    unk_10: [4]u8,
+    unk_10: u32,
 };
 
 pub const Data = struct {
