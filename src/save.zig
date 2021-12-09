@@ -56,11 +56,11 @@ pub const Data = struct {
 pub const Header = struct {
     magic: u32,
     unk_04: [0x8]u8,
-    checksum: Checksum,
+    checksums: Checksums,
     unk_18: [0x8]u8,
 };
 
-pub const Checksum = struct {
+pub const Checksums = struct {
     low: u32,
     high: u32,
     xor: u32,
@@ -77,7 +77,7 @@ pub fn ChecksumReader(comptime ReaderType: type) type {
 
         const Self = @This();
 
-        pub fn finalize(self: Self) error{NotFinalized}!Checksum {
+        pub fn finalize(self: Self) error{NotFinalized}!Checksums {
             return try self.checksum_state.finalize();
         }
 
@@ -112,7 +112,7 @@ pub fn ChecksumWriter(comptime WriterType: type) type {
 
         const Self = @This();
 
-        pub fn finalize(self: Self) error{NotFinalized}!Checksum {
+        pub fn finalize(self: Self) error{NotFinalized}!Checksums {
             return try self.checksum_state.finalize();
         }
 
@@ -143,7 +143,7 @@ pub fn checksumWriter(underlying_stream: anytype) ChecksumWriter(@TypeOf(underly
 }
 
 pub const ChecksumState = struct {
-    checksum: Checksum = .{ .low = 0, .high = 0, .xor = 0 },
+    sums: Checksums = .{ .low = 0, .high = 0, .xor = 0 },
     state: [4]u8 = undefined,
     index: usize = 0,
 
@@ -155,15 +155,15 @@ pub const ChecksumState = struct {
             self.index = 0;
             const word = @bitCast(u32, self.state);
 
-            self.checksum.low += @truncate(u16, word);
-            self.checksum.high += @truncate(u16, word >> @bitSizeOf(u16));
-            self.checksum.xor ^= word;
+            self.sums.low += @truncate(u16, word);
+            self.sums.high += @truncate(u16, word >> @bitSizeOf(u16));
+            self.sums.xor ^= word;
         }
     }
 
-    pub fn finalize(self: ChecksumState) error{NotFinalized}!Checksum {
+    pub fn finalize(self: ChecksumState) error{NotFinalized}!Checksums {
         if (self.index == 0) {
-            return self.checksum;
+            return self.sums;
         } else {
             return error.NotFinalized;
         }

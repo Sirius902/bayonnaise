@@ -37,9 +37,9 @@ pub fn main() !void {
 
     std.log.info("magic = {x:0>8},\tchecksums = {{ low = {x:0>8}, high = {x:0>8}, xor = {x:0>8} }}", .{
         save_data.header.magic,
-        save_data.header.checksum.low,
-        save_data.header.checksum.high,
-        save_data.header.checksum.xor,
+        save_data.header.checksums.low,
+        save_data.header.checksums.high,
+        save_data.header.checksums.xor,
     });
 
     const computed = try checksum_reader.finalize();
