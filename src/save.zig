@@ -50,7 +50,10 @@ pub const Data = struct {
     unk_EF4C: [0x8]u8,
     halos: u32,
     unk_EF58: [0xCF8]u8,
-    unk_FC50: [0x1B0]u8, // current chapter stats
+    current_overall_stats: BattleStats,
+    unk_FC64: [0x50]u8,
+    current_verse_stats: [16]BattleStats,
+    unk_FDF4: [0xC]u8,
     unk_FE00: [0x178]u8, // current combo stats
     unk_FF78: [0x15D8]u8,
 };
