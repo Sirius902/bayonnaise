@@ -13,7 +13,7 @@ pub const ChapterStats = struct {
     overall: BattleStats,
     unk_18: [0x18]u8,
     deaths: u16,
-    unk_32: [2]u8,
+    pad_32: [2]u8,
     verses: [16]BattleStats,
     flags: u32, // & 0x40000000 is true if received platinum trophy
 };
@@ -50,7 +50,9 @@ pub const Data = struct {
     unk_EF4C: [0x8]u8,
     halos: u32,
     unk_EF58: [0xCF8]u8,
-    unk_FC50: [0x1900]u8, // current chapter stats
+    unk_FC50: [0x1B0]u8, // current chapter stats
+    unk_FE00: [0x178]u8, // current combo stats
+    unk_FF78: [0x15D8]u8,
 };
 
 pub const Header = struct {
