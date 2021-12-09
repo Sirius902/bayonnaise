@@ -1,7 +1,7 @@
 const std = @import("std");
-const Allocator = std.mem.Allocator;
+const s = @import("serialize.zig");
 
-pub const pc_save_len = streamedSize(Data);
+pub const pc_save_len = s.streamedSize(Data);
 comptime {
     const expected_len = 0x11550;
     if (pc_save_len != expected_len)
@@ -64,45 +64,6 @@ pub const Checksum = struct {
     low: u32,
     high: u32,
     xor: u32,
-
-    pub fn retrieve(stream: anytype) !Checksum {
-        try stream.seekTo(0xC);
-        const reader = stream.reader();
-
-        return Checksum{
-            .low = try reader.readIntLittle(u32),
-            .high = try reader.readIntLittle(u32),
-            .xor = try reader.readIntLittle(u32),
-        };
-    }
-
-    pub fn compute(stream: anytype) !Checksum {
-        try stream.seekTo(0x20);
-        const reader = stream.reader();
-
-        var low: u32 = 0;
-        var high: u32 = 0;
-        var xor: u32 = 0;
-
-        while (true) {
-            const word = reader.readIntLittle(u32) catch |err| {
-                switch (err) {
-                    error.EndOfStream => break,
-                    else => return err,
-                }
-            };
-
-            low += @truncate(u16, word);
-            high += @truncate(u16, word >> @bitSizeOf(u16));
-            xor ^= word;
-        }
-
-        return Checksum{
-            .low = low,
-            .high = high,
-            .xor = xor,
-        };
-    }
 };
 
 pub fn ChecksumReader(comptime ReaderType: type) type {
@@ -124,7 +85,7 @@ pub fn ChecksumReader(comptime ReaderType: type) type {
             const read_len = try self.wrapped_reader.read(dest);
 
             for (dest) |b| {
-                if (self.header_state < comptime streamedSize(Header)) {
+                if (self.header_state < comptime s.streamedSize(Header)) {
                     self.header_state += 1;
                 } else {
                     self.checksum_state.feed(b);
@@ -157,7 +118,7 @@ pub fn ChecksumWriter(comptime WriterType: type) type {
 
         pub fn write(self: *Self, bytes: []const u8) Error!usize {
             for (bytes) |b| {
-                if (self.header_state < comptime streamedSize(Header)) {
+                if (self.header_state < comptime s.streamedSize(Header)) {
                     self.header_state += 1;
                 } else {
                     self.checksum_state.feed(b);
@@ -209,81 +170,6 @@ pub const ChecksumState = struct {
     }
 };
 
-fn streamedSize(comptime T: type) usize {
-    comptime {
-        return switch (@typeInfo(T)) {
-            .Void, .Bool, .Int, .Float => @sizeOf(T),
-            .Struct => |S| blk: {
-                var size: usize = 0;
-                inline for (S.fields) |field| {
-                    if (field.is_comptime) continue;
-                    size += streamedSize(field.field_type);
-                }
-                break :blk size;
-            },
-            .Array => |A| A.len * streamedSize(A.child),
-            else => @compileError("unsupported type: " ++ @typeName(T)),
-        };
-    }
-}
-
-fn streamedOffset(comptime T: type, comptime field_name: []const u8) usize {
-    comptime {
-        var offset: usize = 0;
-        inline for (@typeInfo(T).Struct.fields) |field| {
-            if (field.is_comptime) continue;
-            if (std.mem.eql(u8, field.name, field_name)) return offset;
-            offset += streamedSize(field.field_type);
-        }
-        @compileError("no field \"" ++ field_name ++ "\" on type \"" ++ @typeName(T) ++ "\"");
-    }
-}
-
-fn DeserializeError(comptime ReaderType: type) type {
-    return ReaderType.Error || error{EndOfStream} || Allocator.Error;
-}
-
-fn deserializeInto(comptime T: type, t: *T, reader: anytype) !void {
-    switch (@typeInfo(T)) {
-        .Void => {},
-        .Bool => t.* = try reader.readByte() != 0,
-        .Int, .Float => t.* = try reader.readInt(T, std.builtin.Endian.Little),
-        .Struct => |S| {
-            inline for (S.fields) |field| {
-                if (field.is_comptime) continue;
-                try deserializeInto(field.field_type, &@field(t.*, field.name), reader);
-            }
-        },
-        .Array => |A| {
-            switch (A.child) {
-                u8 => {
-                    if ((try reader.readAll(t)) < A.len) {
-                        return error.EndOfStream;
-                    }
-                },
-                else => {
-                    for (t) |*v| {
-                        try deserializeInto(A.child, v, reader);
-                    }
-                },
-            }
-        },
-        else => @compileError("unsupported type: " ++ @typeName(T)),
-    }
-}
-
-pub fn deserialize(reader: anytype, allocator: Allocator) DeserializeError(@TypeOf(reader))!*Data {
-    var data = try allocator.create(Data);
-    errdefer allocator.destroy(data);
-
-    inline for (comptime std.meta.fields(Data)) |field| {
-        if (field.is_comptime) continue;
-        try deserializeInto(field.field_type, &@field(data.*, field.name), reader);
-    }
-
-    return data;
-}
-
 test "unk and pad fields are named correctly" {
     const ExpectedTuple = std.meta.Tuple(&[_]type{ []const u8, []const u8 });
     comptime var type_stack: []const type = &.{Data};
@@ -299,7 +185,7 @@ test "unk and pad fields are named correctly" {
                     const expected = std.fmt.comptimePrint("{s}.{s}{X:0>2}", .{
                         @typeName(T),
                         field.name[0..4],
-                        streamedOffset(T, field.name),
+                        s.streamedOffset(T, field.name),
                     });
                     const actual = @typeName(T) ++ "." ++ field.name;
                     expected_tuple = expected_tuple ++ &[_]ExpectedTuple{.{ expected, actual }};
