@@ -27,12 +27,18 @@ pub const BattleStats = struct {
     unk_10: u32,
 };
 
+pub const ComboStats = struct {
+    unk_00: [0x120]u8,
+    unk_120: [0x58]u8,
+};
+
 pub const Data = struct {
     header: Header,
-    unk_20: [0x14]u8,
+    unk_20: [0x10]u8,
+    unk_30: u32,
     play_time: u32,
     chapter: i32,
-    unk_3C: [0x4]u8,
+    unk_3C: u32,
     difficulty: i32,
     unk_44: [0x64]u8,
     chapter_stats: [5][20]ChapterStats,
@@ -40,7 +46,8 @@ pub const Data = struct {
     chapter_clears: u32,
     unk_EE10: [0xC]u8,
     character_model: u32,
-    unk_EE20: [0xDA]u8,
+    unk_EE20: [0x30]u8,
+    unk_EE50: [0xAA]u8,
     weapons: u16,
     unk_EEFC: [0x28]u8,
     character: u32,
@@ -51,12 +58,27 @@ pub const Data = struct {
     halos: u32,
     unk_EF58: [0xCF8]u8,
     chapter_overall_stats: BattleStats,
-    unk_FC64: [0x3C]u8,
+    unk_FC64: [0x18]u8,
+    unk_FC7C: u16,
+    pad_FC7E: [2]u8,
+    unk_FC80: [0x18]u8,
+    unk_FC98: u32,
+    unk_FC9C: u32,
     current_verse_stats: BattleStats,
     chapter_verses_stats: [16]BattleStats,
-    unk_FDF4: [0xC]u8,
-    unk_FE00: [0x178]u8, // current combo stats
-    unk_FF78: [0x15D8]u8,
+    unk_FDF4: u32,
+    unk_FDF8: u32,
+    pad_FDFC: [4]u8,
+    unk_FE00: ComboStats,
+    unk_FF78: [0x688]u8,
+    unk_10600: u32,
+    unk_10604: u32,
+    unk_10608: [0xE3C]u8,
+    unk_11444: u32,
+    unk_11448: u32,
+    unk_1144C: [0xF8]u8,
+    unk_11544: u32,
+    unk_11548: [0x8]u8,
 };
 
 pub const Header = struct {
