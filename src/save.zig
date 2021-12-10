@@ -35,7 +35,7 @@ pub const ComboStats = struct {
 // TODO: Turn these into actual structs
 pub const Data = struct {
     header: Header,
-    unk_20: [0x10]u8,
+    pad_20: [0x10]u8,
     // substruct, size = 0xEE80 | FUN_00c18730
     unk_30: u32,
     play_time: u32,
