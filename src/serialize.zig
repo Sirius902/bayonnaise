@@ -38,7 +38,11 @@ fn deserializeInto(comptime T: type, t: *T, reader: anytype) !void {
     switch (@typeInfo(T)) {
         .Void => {},
         .Bool => t.* = try reader.readByte() != 0,
-        .Int, .Float => t.* = try reader.readInt(T, std.builtin.Endian.Little),
+        .Int => t.* = try reader.readInt(T, std.builtin.Endian.Little),
+        .Float => |F| t.* = @bitCast(T, try reader.readInt(
+            std.meta.Int(.signed, F.bits),
+            std.builtin.Endian.Little,
+        )),
         .Struct => |S| {
             inline for (S.fields) |field| {
                 if (field.is_comptime) continue;
