@@ -62,7 +62,7 @@ pub fn main() !void {
     std.log.info("chapter clears: {}", .{save_data.chapter_clears});
 
     std.log.info("====<Normal> Prologue Stats====", .{});
-    const ch = &save_data.difficulties[2][1];
+    const ch = &save_data.chapter_stats[2][1];
     std.log.info("info: {x:0>2}", .{ch.info});
     std.log.info("time: {:0>2}:{:0>2}:{:0>2}.{:0>2} | frames: {}", .{
         ch.overall.time / (60 * 60 * 60),
