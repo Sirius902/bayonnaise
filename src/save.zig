@@ -32,9 +32,11 @@ pub const ComboStats = struct {
     unk_120: [0x58]u8,
 };
 
+// TODO: Turn these into actual structs
 pub const Data = struct {
     header: Header,
     unk_20: [0x10]u8,
+    // substruct, size = 0xEE80 | FUN_00c18730
     unk_30: u32,
     play_time: u32,
     chapter: i32,
@@ -47,7 +49,10 @@ pub const Data = struct {
     unk_EE10: [0xC]u8,
     character_model: u32,
     unk_EE20: [0x30]u8,
-    unk_EE50: [0xAA]u8,
+    unk_EE50: [0x60]u8,
+    // substruct end
+    // substruct, size = 0xDA0 | FUN_00c185c0
+    unk_EEB0: [0x4A]u8,
     weapons: u16,
     unk_EEFC: [0x28]u8,
     character: u32,
@@ -62,6 +67,8 @@ pub const Data = struct {
     unk_F090: [0x24]u8,
     unk_F0B4: u32,
     unk_F0B8: [0xB98]u8,
+    // substruct end
+    // substruct, size = 0x330 | FUN_00c185c0
     chapter_overall_stats: BattleStats,
     unk_FC64: [0x18]u8,
     unk_FC7C: u16,
@@ -75,7 +82,15 @@ pub const Data = struct {
     unk_FDF8: u32,
     pad_FDFC: [4]u8,
     unk_FE00: ComboStats,
-    unk_FF78: [0x688]u8,
+    pad_FF78: [8]u8,
+    // substruct end
+    // substruct, size = 0x15D0 | FUN_00c185c0
+    unk_FF80: struct {
+        unk_00: [0x20]u8,
+        unk_20: [0x40]u8,
+        unk_60: [0x50]u8,
+    },
+    unk_10030: [0x5D0]u8,
     unk_10600: u32,
     unk_10604: u32,
     unk_10608: [0xE3C]u8,
@@ -84,6 +99,7 @@ pub const Data = struct {
     unk_1144C: [0xF8]u8,
     unk_11544: u32,
     unk_11548: [0x8]u8,
+    // substruct end
 };
 
 pub const Header = struct {
