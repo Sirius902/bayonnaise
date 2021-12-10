@@ -104,9 +104,9 @@ pub const Data = struct {
 
 pub const Header = struct {
     magic: u32,
-    unk_04: [0x8]u8,
+    unk_04: u32,
     checksums: Checksums,
-    unk_18: [0x8]u8,
+    pad_18: [8]u8,
 };
 
 pub const Checksums = struct {
