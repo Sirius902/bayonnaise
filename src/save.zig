@@ -32,74 +32,85 @@ pub const ComboStats = struct {
     unk_120: [0x58]u8,
 };
 
-// TODO: Turn these into actual structs
 pub const Data = struct {
     header: Header,
     pad_20: [0x10]u8,
-    // substruct, size = 0xEE80 | FUN_00c18730
-    unk_30: u32,
+    unk_30: DataUnkStruct30,
+    unk_EEB0: DataUnkStructEEB0,
+    unk_FC50: DataUnkStructFC50,
+    unk_FF80: DataUnkStructFF80,
+};
+
+// size = 0xEE80 | memcpy at FUN_00c18730
+pub const DataUnkStruct30 = struct {
+    unk_00: u32,
     play_time: u32,
     chapter: i32,
-    unk_3C: u32,
+    unk_0C: u32,
     difficulty: i32,
-    unk_44: [0x64]u8,
+    unk_14: [0x64]u8,
     chapter_stats: [5][20]ChapterStats,
-    unk_9388: [0x5A84]u8,
+    unk_9358: [0x5A84]u8,
     chapter_clears: u32,
-    unk_EE10: [0xC]u8,
+    unk_EDE0: [0xC]u8,
     character_model: u32,
-    unk_EE20: [0x30]u8,
-    unk_EE50: [0x60]u8,
-    // substruct end
-    // substruct, size = 0xDA0 | FUN_00c185c0
-    unk_EEB0: [0x4A]u8,
+    unk_EDF0: [0x30]u8,
+    unk_EE20: [0x60]u8,
+};
+
+// size = 0xDA0 | memcpy at FUN_00c185c0
+pub const DataUnkStructEEB0 = struct {
+    unk_00: [0x4A]u8,
     weapons: u16,
-    unk_EEFC: [0x28]u8,
+    unk_4C: [0x28]u8,
     character: u32,
-    unk_EF28: [0x1C]u8,
+    unk_78: [0x1C]u8,
     techniques: u32, // & 0x8 is Bat Within
     bought_techniques: u32,
-    unk_EF4C: [0x8]u8,
+    unk_9C: [0x8]u8,
     halos: u32,
-    unk_EF58: u32,
-    unk_EF5C: [3]i32,
+    unk_A8: u32,
+    unk_AC: [3]i32,
     inventory: [74]u32,
-    unk_F090: [0x24]u8,
-    unk_F0B4: u32,
-    unk_F0B8: [0xB98]u8,
-    // substruct end
-    // substruct, size = 0x330 | FUN_00c185c0
+    unk_1E0: [0x24]u8,
+    unk_204: u32,
+    unk_208: [0xB98]u8,
+};
+
+// size = 0x330 | memcpy at FUN_00c185c0
+pub const DataUnkStructFC50 = struct {
     chapter_overall_stats: BattleStats,
-    unk_FC64: [0x18]u8,
-    unk_FC7C: u16,
-    pad_FC7E: [2]u8,
-    unk_FC80: [0x18]u8,
-    unk_FC98: u32,
-    unk_FC9C: u32,
+    unk_14: [0x18]u8,
+    unk_2C: u16,
+    pad_2E: [2]u8,
+    unk_30: [0x18]u8,
+    unk_48: u32,
+    unk_4C: u32,
     current_verse_stats: BattleStats,
     chapter_verses_stats: [16]BattleStats,
-    unk_FDF4: u32,
-    unk_FDF8: u32,
-    pad_FDFC: [4]u8,
-    unk_FE00: ComboStats,
-    pad_FF78: [8]u8,
-    // substruct end
-    // substruct, size = 0x15D0 | FUN_00c185c0
-    unk_FF80: struct {
+    unk_1A4: u32,
+    unk_1A8: u32,
+    pad_1AC: [4]u8,
+    unk_1B0: ComboStats,
+    pad_328: [8]u8,
+};
+
+// size = 0x15D0 | memcpy at FUN_00c185c0
+pub const DataUnkStructFF80 = struct {
+    unk_00: struct {
         unk_00: [0x20]u8,
         unk_20: [0x40]u8,
         unk_60: [0x50]u8,
     },
-    unk_10030: [0x5D0]u8,
-    unk_10600: u32,
-    unk_10604: u32,
-    unk_10608: [0xE3C]u8,
-    unk_11444: u32,
-    unk_11448: u32,
-    unk_1144C: [0xF8]u8,
-    unk_11544: u32,
-    unk_11548: [0x8]u8,
-    // substruct end
+    unk_B0: [0x5D0]u8,
+    unk_680: u32,
+    unk_684: u32,
+    unk_688: [0xE3C]u8,
+    unk_14C4: u32,
+    unk_14C8: u32,
+    unk_14CC: [0xF8]u8,
+    unk_15C4: u32,
+    unk_15C8: [0x8]u8,
 };
 
 pub const Header = struct {

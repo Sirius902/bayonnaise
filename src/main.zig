@@ -49,20 +49,20 @@ pub fn main() !void {
         computed.xor,
     });
 
-    std.log.info("chapter: {}", .{save_data.chapter});
-    std.log.info("difficulty: {}", .{save_data.difficulty});
+    std.log.info("chapter: {}", .{save_data.unk_30.chapter});
+    std.log.info("difficulty: {}", .{save_data.unk_30.difficulty});
 
     std.log.info("play time: {:0>2}:{:0>2}:{:0>2} | frames: {}", .{
-        save_data.play_time / (60 * 60 * 60),
-        (save_data.play_time / (60 * 60)) % 60,
-        (save_data.play_time / 60) % 60,
-        save_data.play_time,
+        save_data.unk_30.play_time / (60 * 60 * 60),
+        (save_data.unk_30.play_time / (60 * 60)) % 60,
+        (save_data.unk_30.play_time / 60) % 60,
+        save_data.unk_30.play_time,
     });
-    std.log.info("halos: {}", .{save_data.halos});
-    std.log.info("chapter clears: {}", .{save_data.chapter_clears});
+    std.log.info("halos: {}", .{save_data.unk_EEB0.halos});
+    std.log.info("chapter clears: {}", .{save_data.unk_30.chapter_clears});
 
     std.log.info("====<Normal> Prologue Stats====", .{});
-    const ch = &save_data.chapter_stats[2][1];
+    const ch = &save_data.unk_30.chapter_stats[2][1];
     std.log.info("info: {x:0>2}", .{ch.info});
     std.log.info("time: {:0>2}:{:0>2}:{:0>2}.{:0>2} | frames: {}", .{
         ch.overall.time / (60 * 60 * 60),
@@ -89,9 +89,9 @@ pub fn main() !void {
     std.log.info("=====<Normal> Prologue End=====", .{});
 
     const characters = [_][]const u8{ "Bayonetta", "Jeanne", "Zero" };
-    if (save_data.character < characters.len) {
-        std.log.info("character: {s}", .{characters[save_data.character]});
+    if (save_data.unk_EEB0.character < characters.len) {
+        std.log.info("character: {s}", .{characters[save_data.unk_EEB0.character]});
     } else {
-        std.log.info("character: Invalid = 0x{x:0>8}", .{save_data.character});
+        std.log.info("character: Invalid = 0x{x:0>8}", .{save_data.unk_EEB0.character});
     }
 }
