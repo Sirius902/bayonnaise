@@ -25,11 +25,6 @@ pub fn main() !void {
     };
     defer save_file.close();
 
-    if ((try save_file.stat()).size != save.pc_save_len) {
-        std.log.err("save file has incorrect size", .{});
-        return;
-    }
-
     var checksum_reader = save.checksumReader(std.io.bufferedReader(save_file.reader()).reader());
     const reader = checksum_reader.reader();
     const save_data = try s.deserialize(save.FileData, reader, allocator);

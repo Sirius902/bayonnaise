@@ -1,12 +1,25 @@
 const std = @import("std");
 const s = @import("serialize.zig");
 
-pub const pc_save_len = s.streamedSize(FileData);
 comptime {
-    const expected_len = 0x11550;
-    if (pc_save_len != expected_len)
-        @compileError(std.fmt.comptimePrint("PC save len wrong: expected 0x{x}, got 0x{x}", .{ expected_len, pc_save_len }));
+    inline for (.{
+        .{ .T = FileData, .expected_len = 0x11550 },
+        .{ .T = SystemData, .expected_len = 0x690 },
+    }) |tuple| {
+        const actual_len = s.streamedSize(tuple.T);
+        if (actual_len != tuple.expected_len) {
+            @compileError(std.fmt.comptimePrint("PC {s} len wrong: expected 0x{x}, got 0x{x}", .{
+                @typeName(tuple.T),
+                tuple.expected_len,
+                actual_len,
+            }));
+        }
+    }
 }
+
+pub const SystemData = struct {
+    unk_00: [0x690]u8,
+};
 
 pub const ChapterStats = struct {
     info: u32, // & 1 unlocked, & 2 completed
@@ -233,7 +246,7 @@ pub const ChecksumState = struct {
 
 test "unk and pad fields are named correctly" {
     const ExpectedTuple = std.meta.Tuple(&[_]type{ []const u8, []const u8 });
-    comptime var type_stack: []const type = &.{FileData};
+    comptime var type_stack: []const type = &.{ FileData, SystemData };
     comptime var expected_tuple: []const ExpectedTuple = &.{};
 
     comptime {
