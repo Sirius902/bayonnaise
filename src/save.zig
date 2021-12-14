@@ -1,7 +1,7 @@
 const std = @import("std");
 const s = @import("serialize.zig");
 
-pub const pc_save_len = s.streamedSize(Data);
+pub const pc_save_len = s.streamedSize(FileData);
 comptime {
     const expected_len = 0x11550;
     if (pc_save_len != expected_len)
@@ -32,17 +32,17 @@ pub const ComboStats = struct {
     unk_120: [0x58]u8,
 };
 
-pub const Data = struct {
+pub const FileData = struct {
     header: Header,
     pad_20: [0x10]u8,
-    unk_30: DataUnkStruct30,
-    unk_EEB0: DataUnkStructEEB0,
-    unk_FC50: DataUnkStructFC50,
-    unk_FF80: DataUnkStructFF80,
+    unk_30: FileDataUnkStruct30,
+    unk_EEB0: FileDataUnkStructEEB0,
+    unk_FC50: FileDataUnkStructFC50,
+    unk_FF80: FileDataUnkStructFF80,
 };
 
 // size = 0xEE80 | memcpy at FUN_00c18730
-pub const DataUnkStruct30 = struct {
+pub const FileDataUnkStruct30 = struct {
     unk_00: u32,
     play_time: u32,
     chapter: i32,
@@ -59,7 +59,7 @@ pub const DataUnkStruct30 = struct {
 };
 
 // size = 0xDA0 | memcpy at FUN_00c185c0
-pub const DataUnkStructEEB0 = struct {
+pub const FileDataUnkStructEEB0 = struct {
     unk_00: [0x4A]u8,
     weapons: u16,
     unk_4C: [0x28]u8,
@@ -78,7 +78,7 @@ pub const DataUnkStructEEB0 = struct {
 };
 
 // size = 0x330 | memcpy at FUN_00c185c0
-pub const DataUnkStructFC50 = struct {
+pub const FileDataUnkStructFC50 = struct {
     chapter_overall_stats: BattleStats,
     unk_14: [0x18]u8,
     unk_2C: u16,
@@ -96,7 +96,7 @@ pub const DataUnkStructFC50 = struct {
 };
 
 // size = 0x15D0 | memcpy at FUN_00c185c0
-pub const DataUnkStructFF80 = struct {
+pub const FileDataUnkStructFF80 = struct {
     unk_00: struct {
         unk_00: [0x20]u8,
         unk_20: [0x40]u8,
@@ -233,7 +233,7 @@ pub const ChecksumState = struct {
 
 test "unk and pad fields are named correctly" {
     const ExpectedTuple = std.meta.Tuple(&[_]type{ []const u8, []const u8 });
-    comptime var type_stack: []const type = &.{Data};
+    comptime var type_stack: []const type = &.{FileData};
     comptime var expected_tuple: []const ExpectedTuple = &.{};
 
     comptime {

@@ -32,7 +32,7 @@ pub fn main() !void {
 
     var checksum_reader = save.checksumReader(std.io.bufferedReader(save_file.reader()).reader());
     const reader = checksum_reader.reader();
-    const save_data = try s.deserialize(save.Data, reader, allocator);
+    const save_data = try s.deserialize(save.FileData, reader, allocator);
     defer allocator.destroy(save_data);
 
     std.log.info("magic = {x:0>8},\tchecksums = {{ low = {x:0>8}, high = {x:0>8}, xor = {x:0>8} }}", .{
