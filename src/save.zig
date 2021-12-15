@@ -18,7 +18,11 @@ comptime {
 }
 
 pub const SystemData = struct {
-    unk_00: [0x690]u8,
+    header: Header,
+    steam_id: u64,
+    unk_28: u32,
+    unk_2C: [0x11C]u8,
+    unk_148: [0x548]u8,
 };
 
 pub const ChapterStats = struct {
@@ -47,7 +51,8 @@ pub const ComboStats = struct {
 
 pub const FileData = struct {
     header: Header,
-    pad_20: [0x10]u8,
+    steam_id: u64,
+    pad_28: [8]u8,
     unk_30: FileDataUnkStruct30,
     unk_EEB0: FileDataUnkStructEEB0,
     unk_FC50: FileDataUnkStructFC50,
