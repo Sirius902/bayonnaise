@@ -53,7 +53,7 @@ pub const SystemData = struct {
 pub const ChapterStats = struct {
     info: u32, // & 1 unlocked, & 2 completed
     overall: BattleStats,
-    unk_18: [0x4]u8,
+    unk_18: [2]u16,
     unk_1C: ChapterStatsUnkStruct1C,
     verses: [16]BattleStats,
     flags: u32, // & 0x40000000 is true if received platinum trophy
@@ -128,7 +128,7 @@ pub const FileDataUnkStructEEB0 = struct {
 // size = 0x330 | memcpy at FUN_00c185c0
 pub const FileDataUnkStructFC50 = struct {
     chapter_overall_stats: BattleStats,
-    unk_14: [0x4]u8,
+    unk_14: [2]u16,
     unk_18: ChapterStatsUnkStruct1C,
     unk_30: [0x18]u8,
     unk_48: u32,
