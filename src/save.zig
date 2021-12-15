@@ -21,8 +21,7 @@ pub const SystemData = struct {
     header: Header,
     steam_id: u64,
     unk_28: u32,
-    unk_2C: [0x11C]u8,
-    unk_148: [0x548]u8,
+    unk_2C: [0x664]u8,
 };
 
 pub const ChapterStats = struct {
