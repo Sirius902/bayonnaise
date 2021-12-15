@@ -60,7 +60,9 @@ pub const ChapterStats = struct {
 };
 
 pub const ChapterStatsUnkStruct1C = struct {
-    unk_00: [0x14]u8,
+    unk_00: u8,
+    pad_01: [3]u8,
+    unk_04: [0x10]u8,
     deaths: u16,
     pad_16: [2]u8,
 };
