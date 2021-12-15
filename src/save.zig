@@ -21,7 +21,23 @@ pub const SystemData = struct {
     header: Header,
     steam_id: u64,
     unk_28: u32,
-    unk_2C: [0x664]u8,
+    unk_2C: [0xC8]u8,
+    unk_F4: u32,
+    unk_F8: u32, // rumble & 0x80000000
+    unk_FC: u32,
+    unk_100: u32,
+    unk_104: i32,
+    unk_108: f32,
+    unk_10C: i32,
+    unk_110: u32,
+    unk_114: [0x3C]u8,
+    unk_150: [12]f32,
+    unk_180: u64,
+    unk_188: [63][5]u32,
+    unk_674: u32,
+    unk_678: u32,
+    unk_67C: u32,
+    unk_680: [0x10]u8,
 };
 
 pub const ChapterStats = struct {
