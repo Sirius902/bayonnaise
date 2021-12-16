@@ -53,18 +53,9 @@ pub const SystemData = struct {
 pub const ChapterStats = struct {
     info: u32, // & 1 unlocked, & 2 completed
     overall: BattleStats,
-    unk_18: [2]u16,
-    unk_1C: ChapterStatsUnkStruct1C,
+    penalties: [14]u16, // [12] = deaths, [13] = red hot shots
     verses: [16]BattleStats,
     flags: u32, // & 0x40000000 is true if received platinum trophy
-};
-
-pub const ChapterStatsUnkStruct1C = struct {
-    unk_00: u8,
-    pad_01: [3]u8,
-    unk_04: [0x10]u8,
-    deaths: u16,
-    pad_16: [2]u8,
 };
 
 pub const BattleStats = struct {
@@ -130,8 +121,7 @@ pub const FileDataUnkStructEEB0 = struct {
 // size = 0x330 | memcpy at FUN_00c185c0
 pub const FileDataUnkStructFC50 = struct {
     chapter_overall_stats: BattleStats,
-    unk_14: [2]u16,
-    unk_18: ChapterStatsUnkStruct1C,
+    penalties: [14]u16,
     unk_30: [0x18]u8,
     unk_48: u32,
     unk_4C: u32,
