@@ -68,8 +68,44 @@ pub const BattleStats = struct {
 };
 
 pub const ComboStats = struct {
-    unk_00: [0x120]u8,
-    unk_120: [0x58]u8,
+    current_slots: [6]ComboSlot,
+    current_points: i32,
+    unk_124: f32,
+    unk_128: f32,
+    unk_12C: i32, // Also current points?
+    current_bonus: f32,
+    unk_134: i32,
+    halo_count: u32,
+    halo_timer: f32,
+    unk_140: f32,
+    unk_144: u32,
+    current_index: u32,
+    total_points: u32,
+    unk_150: i32,
+    unk_154: i32,
+    unk_158: [0x4]u8,
+    unk_15C: u32,
+    unk_160: u32,
+    unk_164: u32,
+    unk_168: bool,
+    unk_16C: u32,
+    unk_170: f32,
+    unk_174: u32,
+};
+
+pub const ComboSlot = struct {
+    is_active: bool,
+    unk_04: i32,
+    unk_08: i32,
+    damage_type: i32,
+    count: i32,
+    timer: f32,
+    index: i32,
+    is_witch_time: bool,
+    is_angered: bool,
+    unk_24: i32,
+    unk_28: i32,
+    unk_2C: f32,
 };
 
 pub const FileData = struct {
