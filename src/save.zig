@@ -73,7 +73,7 @@ pub const ComboStats = struct {
     unk_124: f32,
     unk_128: f32,
     unk_12C: i32, // Also current points?
-    current_bonus: f32,
+    halo_multiplier: f32,
     high_points: i32,
     halo_count: u32,
     halo_timer: f32,
