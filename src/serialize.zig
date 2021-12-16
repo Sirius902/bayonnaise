@@ -3,7 +3,8 @@ const std = @import("std");
 pub fn streamedSize(comptime T: type) usize {
     comptime {
         return switch (@typeInfo(T)) {
-            .Void, .Bool, .Int, .Float => @sizeOf(T),
+            .Void, .Int, .Float => @sizeOf(T),
+            .Bool => @sizeOf(i32),
             .Struct => |S| blk: {
                 var size: usize = 0;
                 inline for (S.fields) |field| {
@@ -37,7 +38,7 @@ pub fn DeserializeError(comptime ReaderType: type) type {
 fn deserializeInto(comptime T: type, t: *T, reader: anytype) !void {
     switch (@typeInfo(T)) {
         .Void => {},
-        .Bool => t.* = try reader.readByte() != 0,
+        .Bool => t.* = (try reader.readInt(i32, std.builtin.Endian.Little)) != 0,
         .Int => t.* = try reader.readInt(T, std.builtin.Endian.Little),
         .Float => |F| t.* = @bitCast(T, try reader.readInt(
             std.meta.Int(.signed, F.bits),
