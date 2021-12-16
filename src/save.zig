@@ -78,7 +78,7 @@ pub const ComboStats = struct {
     halo_count: u32,
     halo_timer: f32,
     unk_140: f32,
-    unk_144: u32,
+    is_taunting: bool,
     current_index: u32,
     total_points: u32,
     unk_150: i32,
